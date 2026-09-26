@@ -2,15 +2,20 @@ Package: ttk
 Title: Wrapper for 'TTK' the Topology Toolkit
 Version: 0.0.0.9000
 Authors@R: person("Christophe", "Regouby", role = c("aut", "cph", "cre"), email = "christophe.regouby@free.fr")
-Description: Provides R wrappers for 3D Topological Data Analysis from 'TTK Topology Toolkit'  via direct 'Rcpp' bindings 'C++' 'TTK' library.
+Description: Provides R bindings to the Topology Toolkit (TTK) C++ library
+    for topological data analysis on 3D meshes. Wraps core TTK algorithms
+    including critical points, persistence diagrams, contour trees, merge trees,
+    and Morse-Smale complexes as R functions operating on mesh3d objects.
 License: Apache License (>= 2)
 Config/roxygen2/version: 8.1.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
+SystemRequirements: TTK (>= 1.4.0), C++17
 LinkingTo: 
     Rcpp
 Imports: 
-    Rcpp
+    Rcpp, rgl
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+NeedsCompilation: yes

@@ -1,11 +1,11 @@
-USE_PKGCONFIG = no
-TTK_LIB_SUBDIR = x86_64-linux-gnu
+USE_PKGCONFIG = @USE_PKGCONFIG@
+TTK_LIB_SUBDIR = @TTK_LIB_SUBDIR@
 
 ifeq ($(USE_PKGCONFIG),yes)
   PKG_CPPFLAGS = @PKG_CFLAGS@
   PKG_LIBS = @PKG_LIBS@
 else
-  TTK_PREFIX = ttk
+  TTK_PREFIX = @TTK_PREFIX@
   
   PKG_CPPFLAGS = -I$(TTK_PREFIX)/include \
                  -I$(TTK_PREFIX)/include/ttk/base \

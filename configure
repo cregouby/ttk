@@ -1,51 +1,86 @@
 #!/bin/sh
 # configure script for the ttk R package
-# Detects TTK installation and generates src/Makevars
 
-# Default prefix where TTK might be installed
-TTK_PREFIX="${TTK_PREFIX:-/usr/local}"
+TTK_PREFIX=""
+USE_PKGCONFIG=no
 
-# Also check common alternative locations
-for prefix in /usr/local /usr /opt/ttk /opt/local; do
-    if [ -f "${prefix}/include/ttk/Triangulation.h" ]; then
-        TTK_PREFIX="${prefix}"
-        break
+# Check for local installation in src/ttk
+# NOTE: Makevars paths are relative to src/, so we use "ttk" not "src/ttk"
+if [ -d "src/ttk/include/ttk" ]; then
+    TTK_PREFIX="ttk"
+    echo "Using locally installed TTK in src/ttk"
+elif [ -d "src/ttk" ]; then
+    echo "src/ttk exists but TTK headers not found. Re-downloading..."
+    Rscript tools/inst_ttk/install_ttk.R
+    if [ -d "src/ttk/include/ttk" ]; then
+        TTK_PREFIX="ttk"
     fi
-done
+fi
 
-# Try pkg-config as a fallback
-if command -v pkg-config > /dev/null 2>&1; then
+# Fallback to system installation
+if [ -z "$TTK_PREFIX" ] && [ -n "$TTK_PREFIX_SYSTEM" ]; then
+    TTK_PREFIX="$TTK_PREFIX_SYSTEM"
+elif [ -z "$TTK_PREFIX" ]; then
+    for prefix in /usr/local /usr /opt/ttk /opt/local; do
+        if [ -f "${prefix}/include/ttk/Triangulation.h" ] || \
+           [ -f "${prefix}/include/ttk/base/Triangulation.h" ]; then
+            TTK_PREFIX="${prefix}"
+            echo "Using system TTK at ${prefix}"
+            break
+        fi
+    done
+fi
+
+# Try pkg-config
+if [ -z "$TTK_PREFIX" ] && command -v pkg-config > /dev/null 2>&1; then
     if pkg-config --exists ttk; then
         TTK_CFLAGS=$(pkg-config --cflags ttk)
         TTK_LIBS=$(pkg-config --libs ttk)
         USE_PKGCONFIG=yes
+        echo "Using pkg-config for TTK"
     fi
 fi
 
-# Verify that TTK headers exist
-if [ ! -f "${TTK_PREFIX}/include/ttk/Triangulation.h" ] && [ "${USE_PKGCONFIG}" != "yes" ]; then
-    echo "ERROR: TTK not found."
-    echo ""
-    echo "TTK (Topology Toolkit) must be installed before building this package."
-    echo ""
-    echo "Options:"
-    echo "  1. Install TTK system-wide:"
-    echo "     See tools/inst_ttk/Makevars.txt for build instructions"
-    echo ""
-    echo "  2. Set TTK_PREFIX to your TTK installation:"
-    echo "     TTK_PREFIX=/path/to/ttk R CMD INSTALL ttk"
-    echo ""
-    echo "  3. Install via the helper script:"
-    echo "     Rscript tools/inst_ttk/install_ttk.R"
-    echo ""
-    exit 1
+# Auto-install if not found
+if [ -z "$TTK_PREFIX" ] && [ "$USE_PKGCONFIG" != "yes" ]; then
+    echo "TTK not found. Attempting automatic installation..."
+    Rscript tools/inst_ttk/install_ttk.R
+
+    if [ -d "src/ttk/include/ttk" ]; then
+        TTK_PREFIX="ttk"
+        echo "TTK installed successfully"
+    else
+        echo "ERROR: Automatic TTK installation failed."
+        exit 1
+    fi
+fi
+
+# Detect library directory structure
+TTK_LIB_SUBDIR=""
+if [ -d "src/ttk/lib/x86_64-linux-gnu" ]; then
+    TTK_LIB_SUBDIR="x86_64-linux-gnu"
+    echo "Detected multiarch lib directory: ${TTK_LIB_SUBDIR}"
+elif [ -n "$TTK_PREFIX" ] && [ "$TTK_PREFIX" != "ttk" ]; then
+    if [ -d "${TTK_PREFIX}/lib/x86_64-linux-gnu" ]; then
+        TTK_LIB_SUBDIR="x86_64-linux-gnu"
+    fi
 fi
 
 # Generate src/Makevars from template
-sed -e "s|@TTK_PREFIX@|${TTK_PREFIX}|g" \
-    src/Makevars.in > src/Makevars
+if [ "$USE_PKGCONFIG" = "yes" ]; then
+    sed -e "s|@PKG_CFLAGS@|${TTK_CFLAGS}|g" \
+        -e "s|@PKG_LIBS@|${TTK_LIBS}|g" \
+        -e "s|@USE_PKGCONFIG@|yes|g" \
+        -e "s|@TTK_LIB_SUBDIR@||g" \
+        src/Makevars.in > src/Makevars
+else
+    sed -e "s|@TTK_PREFIX@|${TTK_PREFIX}|g" \
+        -e "s|@USE_PKGCONFIG@|no|g" \
+        -e "s|@TTK_LIB_SUBDIR@|${TTK_LIB_SUBDIR}|g" \
+        src/Makevars.in > src/Makevars
+fi
 
-echo "TTK found at: ${TTK_PREFIX}"
 echo "src/Makevars generated successfully."
-
+echo "TTK_PREFIX=${TTK_PREFIX}"
+cat src/Makevars
 exit 0

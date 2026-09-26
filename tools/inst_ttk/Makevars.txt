@@ -1,0 +1,106 @@
+TTK (Topology Toolkit) Installation Guide
+==========================================
+
+This file describes how to build and install TTK from source
+on any platform supported by CMake.
+
+Prerequisites
+-------------
+  - CMake >= 3.12
+  - C++17 compatible compiler (GCC >= 8, Clang >= 7, MSVC >= 2019)
+  - Boost headers (optional, for some modules)
+  - Eigen3 (optional, for linear algebra)
+
+Build Instructions (all platforms)
+----------------------------------
+
+1. Clone the TTK repository:
+
+     git clone https://github.com/topology-tool-kit/ttk.git
+     cd ttk
+     git checkout 1.4.0
+
+2. Create a build directory:
+
+     mkdir build
+     cd build
+
+3. Configure with CMake:
+
+     cmake .. \
+       -DCMAKE_INSTALL_PREFIX=/usr/local \
+       -DCMAKE_BUILD_TYPE=Release \
+       -DBUILD_SHARED_LIBS=ON \
+       -DTTK_ENABLE_PYTHON=OFF \
+       -DTTK_ENABLE_PARAVIEW=OFF \
+       -DTTK_ENABLE_OMP=ON
+
+   On Windows (Visual Studio):
+
+     cmake .. ^
+       -DCMAKE_INSTALL_PREFIX=C:/TTK ^
+       -DCMAKE_BUILD_TYPE=Release ^
+       -DBUILD_SHARED_LIBS=ON ^
+       -DTTK_ENABLE_PYTHON=OFF ^
+       -DTTK_ENABLE_PARAVIEW=OFF ^
+       -G "Visual Studio 17 2022"
+
+4. Build:
+
+     cmake --build . --config Release -j$(nproc)
+
+   On Windows:
+
+     cmake --build . --config Release -j %NUMBER_OF_PROCESSORS%
+
+5. Install:
+
+     cmake --install .
+
+   On Windows (requires administrator privileges):
+
+     cmake --install . --config Release
+
+6. Verify:
+
+     ls /usr/local/include/ttk/Triangulation.h
+     ls /usr/local/lib/libttkCore*
+
+   On Windows:
+
+     dir C:\TTK\include\ttk\Triangulation.h
+     dir C:\TTK\lib\ttkCore*
+
+Platform-specific notes
+-----------------------
+
+Linux (Debian/Ubuntu):
+  sudo apt-get install -y build-essential cmake libboost-all-dev libeigen3-dev
+
+Linux (Fedora/RHEL):
+  sudo dnf install -y gcc-c++ cmake boost-devel eigen3-devel
+
+macOS:
+  brew install cmake boost eigen
+
+Windows:
+  Install Visual Studio 2022 with C++ workload
+  Install CMake from https://cmake.org/download/
+  Optionally install Boost and Eigen via vcpkg:
+    vcpkg install boost eigen3
+
+Installing the R package after TTK
+------------------------------------
+
+Once TTK is installed, build the R package:
+
+  R CMD INSTALL ttk
+
+Or if TTK is in a non-standard location:
+
+  TTK_PREFIX=/path/to/ttk R CMD INSTALL ttk
+
+On Windows:
+
+  set TTK_PREFIX=C:/TTK
+  R CMD INSTALL ttk
