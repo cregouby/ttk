@@ -1,0 +1,25 @@
+@echo off
+rem configure.win for the ttk R package on Windows
+rem Detects TTK installation and generates src/Makevars
+
+set TTK_PREFIX=%TTK_PREFIX%
+if "%TTK_PREFIX%"=="" set TTK_PREFIX=C:/TTK
+
+rem Check if TTK headers exist
+if not exist "%TTK_PREFIX%/include/ttk/Triangulation.h" (
+    echo ERROR: TTK not found at %TTK_PREFIX%
+    echo.
+    echo TTK must be installed before building this package.
+    echo Set TTK_PREFIX to your TTK installation directory:
+    echo   set TTK_PREFIX=C:/path/to/ttk
+    echo   R CMD INSTALL ttk
+    exit /b 1
+)
+
+rem Generate src/Makevars from template
+sed -e "s|@TTK_PREFIX@|%TTK_PREFIX%|g" src/Makevars.in > src/Makevars
+
+echo TTK found at: %TTK_PREFIX%
+echo src/Makevars generated successfully.
+
+exit /b 0

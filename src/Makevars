@@ -1,0 +1,17 @@
+PKG_CPPFLAGS = -I/usr/local/include -I$(R_HOME)/include
+PKG_LIBS = -L/usr/local/lib -lttkCore -lttkPersistenceDiagram \
+           -lttkCriticalPoints -lttkContourTree -lttkMergeTree \
+           -lttkMorseSmaleComplex
+
+# Windows specific
+ifeq ($(OS),Windows_NT)
+PKG_CPPFLAGS += -I"C:/TTK/include"
+PKG_LIBS += -L"C:/TTK/lib"
+endif
+
+# macOS specific
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+PKG_CPPFLAGS += -I/usr/local/include
+PKG_LIBS += -L/usr/local/lib
+endif

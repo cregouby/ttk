@@ -1,0 +1,51 @@
+#!/bin/sh
+# configure script for the ttk R package
+# Detects TTK installation and generates src/Makevars
+
+# Default prefix where TTK might be installed
+TTK_PREFIX="${TTK_PREFIX:-/usr/local}"
+
+# Also check common alternative locations
+for prefix in /usr/local /usr /opt/ttk /opt/local; do
+    if [ -f "${prefix}/include/ttk/Triangulation.h" ]; then
+        TTK_PREFIX="${prefix}"
+        break
+    fi
+done
+
+# Try pkg-config as a fallback
+if command -v pkg-config > /dev/null 2>&1; then
+    if pkg-config --exists ttk; then
+        TTK_CFLAGS=$(pkg-config --cflags ttk)
+        TTK_LIBS=$(pkg-config --libs ttk)
+        USE_PKGCONFIG=yes
+    fi
+fi
+
+# Verify that TTK headers exist
+if [ ! -f "${TTK_PREFIX}/include/ttk/Triangulation.h" ] && [ "${USE_PKGCONFIG}" != "yes" ]; then
+    echo "ERROR: TTK not found."
+    echo ""
+    echo "TTK (Topology Toolkit) must be installed before building this package."
+    echo ""
+    echo "Options:"
+    echo "  1. Install TTK system-wide:"
+    echo "     See tools/inst_ttk/Makevars.txt for build instructions"
+    echo ""
+    echo "  2. Set TTK_PREFIX to your TTK installation:"
+    echo "     TTK_PREFIX=/path/to/ttk R CMD INSTALL ttk"
+    echo ""
+    echo "  3. Install via the helper script:"
+    echo "     Rscript tools/inst_ttk/install_ttk.R"
+    echo ""
+    exit 1
+fi
+
+# Generate src/Makevars from template
+sed -e "s|@TTK_PREFIX@|${TTK_PREFIX}|g" \
+    src/Makevars.in > src/Makevars
+
+echo "TTK found at: ${TTK_PREFIX}"
+echo "src/Makevars generated successfully."
+
+exit 0
