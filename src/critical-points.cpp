@@ -75,12 +75,13 @@ MeshData extract_mesh3d_data(const Rcpp::List& mesh,
   return data;
 }
 
+
 // [[Rcpp::export]]
-Rcpp::List ttk_critical_points_cpp(const Rcpp::List& mesh,
-                                   const std::string& scalar_field_name,
-                                   bool compute_minima,
-                                   bool compute_maxima,
-                                   bool compute_saddle_points) {
+Rcpp::List critical_points_cpp(const Rcpp::List& mesh,
+                               const std::string& scalar_field_name,
+                               bool compute_minima,
+                               bool compute_maxima,
+                               bool compute_saddle_points) {
   try {
     MeshData mesh_data = extract_mesh3d_data(mesh, scalar_field_name);
     

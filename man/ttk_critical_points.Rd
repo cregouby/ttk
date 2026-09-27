@@ -2,7 +2,7 @@
 % Please edit documentation in R/critical-points.R
 \name{ttk_critical_points}
 \alias{ttk_critical_points}
-\title{Extract critical points from scalar field}
+\title{Extract critical points from a scalar field on a mesh}
 \usage{
 ttk_critical_points(
   mesh,
@@ -13,7 +13,7 @@ ttk_critical_points(
 )
 }
 \arguments{
-\item{mesh}{A mesh3d object with scalar field 'data'}
+\item{mesh}{A mesh3d object with a scalar field}
 
 \item{vertex_scalar_field}{Name of the scalar field (default: "data")}
 
@@ -27,12 +27,5 @@ ttk_critical_points(
 A list with critical points coordinates and types
 }
 \description{
-Extract critical points from scalar field
-}
-\examples{
-\dontrun{
-mesh <- rgl::mesh3d(...)
-mesh$data <- runif(length(mesh$vb[1,]))
-cp <- ttk_critical_points(mesh)
-}
+Extract critical points from a scalar field on a mesh
 }
