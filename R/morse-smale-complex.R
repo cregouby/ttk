@@ -9,10 +9,30 @@
 ttk_morse_smale_complex <- function(mesh,
                                     vertex_scalar_field = "data",
                                     simplify_threshold = 0.0) {
-  result <- .Call("morse_smale_complex_cpp",
-                  mesh,
-                  vertex_scalar_field,
-                  simplify_threshold)
+  if (!inherits(mesh, "mesh3d")) {
+    stop("Input must be a mesh3d object from package rgl")
+  }
   
-  return(result)
+  if (!vertex_scalar_field %in% names(mesh)) {
+    stop("Mesh does not contain scalar field: ", vertex_scalar_field)
+  }
+  
+  n_vertices <- ncol(mesh$vb)
+  scalar_data <- mesh[[vertex_scalar_field]]
+  
+  if (length(scalar_data) != n_vertices) {
+    stop(
+      "Scalar field length does not match vertex count. ",
+      "Expected ", n_vertices, " but got ", length(scalar_data)
+    )
+  }
+  
+  result <- morse_smale_complex_cpp(
+    mesh,
+    vertex_scalar_field,
+    simplify_threshold
+  )
+  
+  class(result) <- c("ttk_morse_smale_complex", "list")
+  result
 }
