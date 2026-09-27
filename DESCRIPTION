@@ -1,6 +1,6 @@
 Package: ttk
 Title: Wrapper for 'TTK' the Topology Toolkit
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Christophe", "Regouby", role = c("aut", "cph", "cre"), email = "christophe.regouby@free.fr")
 Description: Provides R bindings to the Topology Toolkit (TTK) C++ library
     for topological data analysis on 3D meshes. Wraps core TTK algorithms
