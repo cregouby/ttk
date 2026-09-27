@@ -10,6 +10,18 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// contour_tree_cpp
+Rcpp::List contour_tree_cpp(const Rcpp::List& mesh, const std::string& scalar_field_name);
+RcppExport SEXP _ttk_contour_tree_cpp(SEXP meshSEXP, SEXP scalar_field_nameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type mesh(meshSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type scalar_field_name(scalar_field_nameSEXP);
+    rcpp_result_gen = Rcpp::wrap(contour_tree_cpp(mesh, scalar_field_name));
+    return rcpp_result_gen;
+END_RCPP
+}
 // critical_points_cpp
 Rcpp::List critical_points_cpp(const Rcpp::List& mesh, const std::string& scalar_field_name, bool compute_minima, bool compute_maxima, bool compute_saddle_points);
 RcppExport SEXP _ttk_critical_points_cpp(SEXP meshSEXP, SEXP scalar_field_nameSEXP, SEXP compute_minimaSEXP, SEXP compute_maximaSEXP, SEXP compute_saddle_pointsSEXP) {
@@ -22,6 +34,30 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type compute_maxima(compute_maximaSEXP);
     Rcpp::traits::input_parameter< bool >::type compute_saddle_points(compute_saddle_pointsSEXP);
     rcpp_result_gen = Rcpp::wrap(critical_points_cpp(mesh, scalar_field_name, compute_minima, compute_maxima, compute_saddle_points));
+    return rcpp_result_gen;
+END_RCPP
+}
+// merge_tree_cpp
+Rcpp::List merge_tree_cpp(const Rcpp::List& mesh, const std::string& scalar_field_name);
+RcppExport SEXP _ttk_merge_tree_cpp(SEXP meshSEXP, SEXP scalar_field_nameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type mesh(meshSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type scalar_field_name(scalar_field_nameSEXP);
+    rcpp_result_gen = Rcpp::wrap(merge_tree_cpp(mesh, scalar_field_name));
+    return rcpp_result_gen;
+END_RCPP
+}
+// morse_smale_complex_cpp
+Rcpp::List morse_smale_complex_cpp(const Rcpp::List& mesh, const std::string& scalar_field_name);
+RcppExport SEXP _ttk_morse_smale_complex_cpp(SEXP meshSEXP, SEXP scalar_field_nameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type mesh(meshSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type scalar_field_name(scalar_field_nameSEXP);
+    rcpp_result_gen = Rcpp::wrap(morse_smale_complex_cpp(mesh, scalar_field_name));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -39,16 +75,19 @@ BEGIN_RCPP
 END_RCPP
 }
 
-RcppExport SEXP ttk_contour_tree_cpp(SEXP, SEXP, SEXP);
-RcppExport SEXP ttk_merge_tree_cpp(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP ttk_morse_smale_complex_cpp(SEXP, SEXP, SEXP);
+RcppExport SEXP contour_tree_cpp(SEXP, SEXP, SEXP);
+RcppExport SEXP merge_tree_cpp(SEXP, SEXP, SEXP, SEXP);
+RcppExport SEXP morse_smale_complex_cpp(SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_ttk_contour_tree_cpp", (DL_FUNC) &_ttk_contour_tree_cpp, 2},
     {"_ttk_critical_points_cpp", (DL_FUNC) &_ttk_critical_points_cpp, 5},
+    {"_ttk_merge_tree_cpp", (DL_FUNC) &_ttk_merge_tree_cpp, 2},
+    {"_ttk_morse_smale_complex_cpp", (DL_FUNC) &_ttk_morse_smale_complex_cpp, 2},
     {"_ttk_persistence_diagram_cpp", (DL_FUNC) &_ttk_persistence_diagram_cpp, 3},
-    {"ttk_contour_tree_cpp",        (DL_FUNC) &ttk_contour_tree_cpp,        3},
-    {"ttk_merge_tree_cpp",          (DL_FUNC) &ttk_merge_tree_cpp,          4},
-    {"ttk_morse_smale_complex_cpp", (DL_FUNC) &ttk_morse_smale_complex_cpp, 3},
+    {"contour_tree_cpp",        (DL_FUNC) &contour_tree_cpp,        3},
+    {"merge_tree_cpp",          (DL_FUNC) &merge_tree_cpp,          4},
+    {"morse_smale_complex_cpp", (DL_FUNC) &morse_smale_complex_cpp, 3},
     {NULL, NULL, 0}
 };
 

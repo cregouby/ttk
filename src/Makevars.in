@@ -1,43 +1,14 @@
-USE_PKGCONFIG = @USE_PKGCONFIG@
-TTK_LIB_SUBDIR = @TTK_LIB_SUBDIR@
+TTK_PREFIX = @TTK_PREFIX@
 
-ifeq ($(USE_PKGCONFIG),yes)
-  PKG_CPPFLAGS = @PKG_CFLAGS@
-  PKG_LIBS = @PKG_LIBS@
-else
-  TTK_PREFIX = @TTK_PREFIX@
-  
-  PKG_CPPFLAGS = -I$(TTK_PREFIX)/include \
-                 -I$(TTK_PREFIX)/include/ttk/base \
-                 -I$(TTK_PREFIX)/include/ttk/vtk
-  
-  PKG_CXXFLAGS = -fpermissive
-  
-  ifneq ($(TTK_LIB_SUBDIR),)
-    TTK_LIB_DIR = $(TTK_PREFIX)/lib/$(TTK_LIB_SUBDIR)
-  else
-    TTK_LIB_DIR = $(TTK_PREFIX)/lib
-  endif
-  
-  # Link against all available TTK libraries using wildcard
-  TTK_LIBS := $(wildcard $(TTK_LIB_DIR)/libttk*.so)
-  
-  ifneq ($(TTK_LIBS),)
-    # Convert full paths to -l flags
-    PKG_LIBS = -L$(TTK_LIB_DIR) $(patsubst $(TTK_LIB_DIR)/lib%.so,-l%,$(TTK_LIBS))
-  else
-    # Fallback: try common library names (should not happen)
-    PKG_LIBS = -L$(TTK_LIB_DIR) \
-               -lttkCore \
-               -lttkTriangulation \
-               -lttkScalarFieldCriticalPoints \
-               -lttkPersistenceDiagram \
-               -lttkContourTree \
-               -lttkMergeTree \
-               -lttkMorseSmaleComplex
-  endif
-  
-  ifneq ($(OS),Windows_NT)
-    PKG_LIBS += -Wl,-rpath,$(TTK_LIB_DIR)
-  endif
-endif
+PKG_CPPFLAGS = -I$(TTK_PREFIX)/include \
+               -I$(TTK_PREFIX)/include/ttk/base \
+               -I$(TTK_PREFIX)/include/ttk/vtk
+
+PKG_CXXFLAGS = -fpermissive
+
+TTK_LIB_DIR = $(TTK_PREFIX)/lib/@TTK_LIB_SUBDIR@
+
+# Use shell to directly extract library names
+TTK_LIB_NAMES := $(shell ls $(TTK_LIB_DIR)/libttk*.so 2>/dev/null | sed 's|.*/lib||;s|\.so$$||')
+
+PKG_LIBS = -L$(TTK_LIB_DIR) $(addprefix -l,$(TTK_LIB_NAMES)) -Wl,-rpath,$(TTK_LIB_DIR)
