@@ -19,15 +19,14 @@ else
     TTK_LIB_DIR = $(TTK_PREFIX)/lib
   endif
   
-  # Link against all available TTK libraries
-  # Use wildcard to find whatever is available
+  # Link against all available TTK libraries using wildcard
   TTK_LIBS := $(wildcard $(TTK_LIB_DIR)/libttk*.so)
   
   ifneq ($(TTK_LIBS),)
     # Convert full paths to -l flags
     PKG_LIBS = -L$(TTK_LIB_DIR) $(patsubst $(TTK_LIB_DIR)/lib%.so,-l%,$(TTK_LIBS))
   else
-    # Fallback: try common library names
+    # Fallback: try common library names (should not happen)
     PKG_LIBS = -L$(TTK_LIB_DIR) \
                -lttkCore \
                -lttkTriangulation \

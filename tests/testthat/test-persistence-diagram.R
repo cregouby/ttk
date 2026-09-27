@@ -37,7 +37,7 @@ test_that("ttk_persistence_diagram rejects negative threshold", {
   )
   
   mesh <- rgl::mesh3d(t(vertices), triangles = t(triangles))
-  mesh$data <- c(0, 0.5, 0.5, 1)
+  mesh$data <- c(0, 0.5, 1)
   
   expect_error(
     ttk_persistence_diagram(mesh, persistence_threshold = -1),
@@ -124,4 +124,70 @@ test_that("ttk_persistence_diagram returns valid persistence values", {
     # Death values should be defined
     expect_true(all(is.finite(result$death_value)))
   }
+})
+
+test_that("as_persistence.ttk_persistence_diagram works", {
+  skip_if_not(
+    is.loaded("_ttk_persistence_diagram_cpp", PACKAGE = "ttk"),
+    message = "TTK shared library not loaded"
+  )
+  skip_if_not_installed("phutil")
+  
+  vertices <- matrix(
+    c(0, 0, 0,
+      1, 0, 0,
+      0, 1, 0,
+      0.5, 0.5, 1),
+    ncol = 3, byrow = TRUE
+  )
+  
+  triangles <- matrix(
+    c(1, 2, 3,
+      2, 3, 4),
+    ncol = 3, byrow = TRUE
+  )
+  
+  mesh <- rgl::mesh3d(t(vertices), triangles = t(triangles))
+  mesh$data <- c(0, 0.5, 0.5, 1)
+  
+  result <- ttk_persistence_diagram(mesh)
+  pd <- as_persistence(result)
+  
+  expect_s3_class(pd, "persistence")
+  expect_true("pairs" %in% names(pd))
+  expect_true("metadata" %in% names(pd))
+  expect_equal(pd$metadata$engine, "ttk::ttk_persistence_diagram")
+  expect_equal(pd$metadata$filtration, "Sublevel set")
+})
+
+test_that("as_diagram.ttk_persistence_diagram works", {
+  skip_if_not(
+    is.loaded("_ttk_persistence_diagram_cpp", PACKAGE = "ttk"),
+    message = "TTK shared library not loaded"
+  )
+  skip_if_not_installed("phutil")
+  
+  vertices <- matrix(
+    c(0, 0, 0,
+      1, 0, 0,
+      0, 1, 0,
+      0.5, 0.5, 1),
+    ncol = 3, byrow = TRUE
+  )
+  
+  triangles <- matrix(
+    c(1, 2, 3,
+      2, 3, 4),
+    ncol = 3, byrow = TRUE
+  )
+  
+  mesh <- rgl::mesh3d(t(vertices), triangles = t(triangles))
+  mesh$data <- c(0, 0.5, 0.5, 1)
+  
+  result <- ttk_persistence_diagram(mesh)
+  diag <- as_diagram(result)
+  
+  expect_s3_class(diag$diagram, "diagram")
+  expect_equal(ncol(diag$diagram), 3)
+  expect_equal(colnames(diag$diagram), c("Dimension", "Birth", "Death"))
 })
