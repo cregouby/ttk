@@ -25,18 +25,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// persistence_diagram_cpp
+Rcpp::List persistence_diagram_cpp(const Rcpp::List& mesh, const std::string& scalar_field_name, double persistence_threshold);
+RcppExport SEXP _ttk_persistence_diagram_cpp(SEXP meshSEXP, SEXP scalar_field_nameSEXP, SEXP persistence_thresholdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type mesh(meshSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type scalar_field_name(scalar_field_nameSEXP);
+    Rcpp::traits::input_parameter< double >::type persistence_threshold(persistence_thresholdSEXP);
+    rcpp_result_gen = Rcpp::wrap(persistence_diagram_cpp(mesh, scalar_field_name, persistence_threshold));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 RcppExport SEXP ttk_contour_tree_cpp(SEXP, SEXP, SEXP);
 RcppExport SEXP ttk_merge_tree_cpp(SEXP, SEXP, SEXP, SEXP);
 RcppExport SEXP ttk_morse_smale_complex_cpp(SEXP, SEXP, SEXP);
-RcppExport SEXP ttk_persistence_diagram_cpp(SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_ttk_critical_points_cpp", (DL_FUNC) &_ttk_critical_points_cpp, 5},
+    {"_ttk_persistence_diagram_cpp", (DL_FUNC) &_ttk_persistence_diagram_cpp, 3},
     {"ttk_contour_tree_cpp",        (DL_FUNC) &ttk_contour_tree_cpp,        3},
     {"ttk_merge_tree_cpp",          (DL_FUNC) &ttk_merge_tree_cpp,          4},
     {"ttk_morse_smale_complex_cpp", (DL_FUNC) &ttk_morse_smale_complex_cpp, 3},
-    {"ttk_persistence_diagram_cpp", (DL_FUNC) &ttk_persistence_diagram_cpp, 3},
     {NULL, NULL, 0}
 };
 

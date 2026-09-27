@@ -6,6 +6,7 @@
 
 #include <ttk/base/Triangulation.h>
 #include <ttk/base/ScalarFieldCriticalPoints.h>
+#include <ttk/base/PersistenceDiagram.h>
 
 #include <vector>
 #include <stdexcept>
@@ -26,9 +27,8 @@ inline void setInputCells(ttk::Triangulation& triangulation,
                               offsets.data());
 #else
   // Old API (TTK < 1.2.0): flat layout [n, v0, v1, ..., n, v0, v1, ...]
-  // Convert from connectivity + offsets to flat layout
   std::vector<ttk::LongSimplexId> flatLayout;
-  flatLayout.reserve(offsets[cellNumber]);
+  flatLayout.reserve(offsets[cellNumber] + cellNumber);
   
   for (ttk::SimplexId i = 0; i < cellNumber; i++) {
     ttk::LongSimplexId start = offsets[i];
@@ -45,7 +45,6 @@ inline void setInputCells(ttk::Triangulation& triangulation,
 }
 
 // Precondition order array
-// Handles signature differences between TTK versions
 inline void preconditionOrderArray(ttk::SimplexId vertexCount,
                                    const float* scalarField,
                                    ttk::SimplexId* order) {
@@ -77,6 +76,25 @@ inline int executeCriticalPoints(
     const ttk::Triangulation* triangulation) {
   
   return criticalPoints.execute(order, triangulation);
+}
+
+// Execute persistence diagram computation
+inline int executePersistenceDiagram(
+    ttk::PersistenceDiagram& diagram,
+    std::vector<ttk::PersistencePair>& output,
+    const float* scalars,
+    const ttk::SimplexId* order,
+    ttk::Triangulation* triangulation) {
+  
+  diagram.preconditionTriangulation(triangulation);
+  
+  return diagram.execute(
+    output,
+    scalars,
+    0,  // offset
+    order,
+    triangulation
+  );
 }
 
 } // namespace ttk_compat

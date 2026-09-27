@@ -1,12 +1,3 @@
-vertices <- matrix(
-  c(0, 0, 0,
-    1, 0, 0,
-    0, 1, 0,
-    0.5, 0.5, 1),
-  ncol = 3, byrow = TRUE
-)
-
-
 test_that("ttk_critical_points rejects non-mesh3d input", {
   bad_input <- list(
     vb = matrix(runif(12), nrow = 3),

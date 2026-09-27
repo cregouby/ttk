@@ -2,24 +2,24 @@
 % Please edit documentation in R/persistence-diagram.R
 \name{ttk_persistence_diagram}
 \alias{ttk_persistence_diagram}
-\title{Compute persistence diagram}
+\title{Compute persistence diagram from a scalar field on a mesh}
 \usage{
 ttk_persistence_diagram(
   mesh,
   vertex_scalar_field = "data",
-  simplify_saddles = FALSE
+  persistence_threshold = 0
 )
 }
 \arguments{
-\item{mesh}{A mesh3d object with scalar field}
+\item{mesh}{A mesh3d object with a scalar field}
 
-\item{vertex_scalar_field}{Name of the scalar field}
+\item{vertex_scalar_field}{Name of the scalar field (default: "data")}
 
-\item{simplify_saddles}{Logical, simplify saddle pairs (default: FALSE)}
+\item{persistence_threshold}{Minimum persistence value to keep (default: 0)}
 }
 \value{
-A data frame with columns: birth, death, dimension, persistence
+A list with persistence pairs information
 }
 \description{
-Compute persistence diagram
+Compute persistence diagram from a scalar field on a mesh
 }
