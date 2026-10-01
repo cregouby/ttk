@@ -9,33 +9,31 @@
 #include <ttk/base/PersistenceDiagram.h>
 
 #include <vector>
-#include <stdexcept>
+#include <cstddef>
 
 namespace ttk_compat {
 
-// Set input cells on a triangulation
-// Automatically detects the correct API at compile time
 inline void setInputCells(ttk::Triangulation& triangulation,
                           ttk::SimplexId cellNumber,
                           const std::vector<ttk::LongSimplexId>& connectivity,
                           const std::vector<ttk::LongSimplexId>& offsets) {
-  
 #ifdef TTK_CELL_ARRAY_NEW
-  // New API (TTK >= 1.2.0): separate connectivity and offsets arrays
   triangulation.setInputCells(cellNumber,
                               connectivity.data(),
                               offsets.data());
 #else
-  // Old API (TTK < 1.2.0): flat layout [n, v0, v1, ..., n, v0, v1, ...]
   std::vector<ttk::LongSimplexId> flatLayout;
-  flatLayout.reserve(offsets[cellNumber] + cellNumber);
+  flatLayout.reserve(static_cast<std::size_t>(offsets[cellNumber]) +
+    static_cast<std::size_t>(cellNumber));
   
-  for (ttk::SimplexId i = 0; i < cellNumber; i++) {
+  for (ttk::SimplexId i = 0; i < cellNumber; ++i) {
     ttk::LongSimplexId start = offsets[i];
     ttk::LongSimplexId end = offsets[i + 1];
     ttk::LongSimplexId nVerts = end - start;
+    
     flatLayout.push_back(nVerts);
-    for (ttk::LongSimplexId j = start; j < end; j++) {
+    
+    for (ttk::LongSimplexId j = start; j < end; ++j) {
       flatLayout.push_back(connectivity[j]);
     }
   }
@@ -44,23 +42,22 @@ inline void setInputCells(ttk::Triangulation& triangulation,
 #endif
 }
 
-// Precondition order array
 inline void preconditionOrderArray(ttk::SimplexId vertexCount,
                                    const float* scalarField,
                                    ttk::SimplexId* order) {
   ttk::preconditionOrderArray(
-    static_cast<size_t>(vertexCount),
+    static_cast<std::size_t>(vertexCount),
     scalarField,
     order,
-    1  // single thread for safety
+    1
   );
 }
 
-// Precondition the triangulation for computation
 inline void preconditionTriangulation(ttk::Triangulation& triangulation) {
   triangulation.preconditionEdges();
   
-  int dim = triangulation.getDimensionality();
+  const int dim = triangulation.getDimensionality();
+  
   if (dim == 2) {
     triangulation.preconditionTriangles();
   } else if (dim == 3) {
@@ -69,7 +66,6 @@ inline void preconditionTriangulation(ttk::Triangulation& triangulation) {
   }
 }
 
-// Execute scalar field critical points
 inline int executeCriticalPoints(
     ttk::ScalarFieldCriticalPoints& criticalPoints,
     const ttk::SimplexId* order,
@@ -78,7 +74,6 @@ inline int executeCriticalPoints(
   return criticalPoints.execute(order, triangulation);
 }
 
-// Execute persistence diagram computation
 inline int executePersistenceDiagram(
     ttk::PersistenceDiagram& diagram,
     std::vector<ttk::PersistencePair>& output,
@@ -91,7 +86,7 @@ inline int executePersistenceDiagram(
   return diagram.execute(
     output,
     scalars,
-    0,  // offset
+    0,
     order,
     triangulation
   );
